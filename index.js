@@ -68,6 +68,23 @@ const server = http.createServer((req, res) => {
       return routes[path](res);
     }
 
+    const [_, route, param] = path.split("/");
+
+    if (route == "status") {
+      const statusCode = parseInt(param);
+
+      if (!isNaN(statusCode) && statusCode >= 100 && statusCode <= 599) {
+        return sendResponse(
+          res,
+          200,
+          "text/plain",
+          `Response with status code: ${statusCode}`
+        );
+      } else {
+        return sendResponse(res, 400, "text/plain", "Invalid status code");
+      }
+    }
+
     return sendResponse(res, 404, "text/plain", "404 Not Found");
   } catch (error) {
     sendResponse(res, 500, "text/plain", "Internal server error");
