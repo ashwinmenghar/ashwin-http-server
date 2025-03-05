@@ -1,4 +1,5 @@
 import http from "http";
+import { v4 as uuidv4 } from "uuid";
 
 const getHtml = () => {
   return `<!DOCTYPE html>
@@ -46,6 +47,13 @@ const routes = {
   "/html": (res) => sendResponse(res, 200, "text/html", getHtml()),
   "/json": (res) =>
     sendResponse(res, 200, "application/json", JSON.stringify(getJson())),
+  "/uuid": (res) =>
+    sendResponse(
+      res,
+      200,
+      "application/json",
+      JSON.stringify({ uuid: uuidv4() })
+    ),
 };
 
 const server = http.createServer((req, res) => {
@@ -54,6 +62,7 @@ const server = http.createServer((req, res) => {
   if (req.method != "GET") {
     sendResponse(res, 405, "text/plain", "Method Not Allowed");
   }
+
   try {
     if (routes[path]) {
       return routes[path](res);
