@@ -1,19 +1,6 @@
 import http from "http";
 import { v4 as uuidv4 } from "uuid";
 
-const getHtml = () => {
-  return `<!DOCTYPE html>
-<html>
-  <head>
-  </head>
-  <body>
-      <h1>Any fool can write code that a computer can understand. Good programmers write code that humans can understand.</h1>
-      <p> - Martin Fowler</p>
-
-  </body>
-</html>`;
-};
-
 const getJson = () => {
   return {
     slideshow: {
@@ -38,6 +25,19 @@ const getJson = () => {
   };
 };
 
+const getHtml = () => {
+  return `<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+      <h1>Any fool can write code that a computer can understand. Good programmers write code that humans can understand.</h1>
+      <p> - Martin Fowler</p>
+
+  </body>
+</html>`;
+};
+
 const sendResponse = (res, status, contentType, content) => {
   res.writeHead(status, { "Content-Type": contentType });
   res.end(content);
@@ -58,11 +58,11 @@ const routes = {
 
 const server = http.createServer((req, res) => {
   const path = req.url;
+  console.log(path);
 
   if (req.method != "GET") {
     sendResponse(res, 405, "text/plain", "Method Not Allowed");
   }
-
   try {
     if (routes[path]) {
       return routes[path](res);
@@ -82,6 +82,22 @@ const server = http.createServer((req, res) => {
         );
       } else {
         return sendResponse(res, 400, "text/plain", "Invalid status code");
+      }
+    }
+
+    if (route == "delay") {
+      let delayInSeconds = parseInt(param);
+      if (!isNaN(delayInSeconds) && delayInSeconds >= 0) {
+        return setTimeout(() => {
+          sendResponse(
+            res,
+            200,
+            "text/plain",
+            `Response after ${delayInSeconds} second's: 200 status code.`
+          );
+        }, delayInSeconds * 1000);
+      } else {
+        return sendResponse(res, 400, "text/plain", "Invalid delay");
       }
     }
 
